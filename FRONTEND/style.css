@@ -1,0 +1,267 @@
+body {
+    background-color: #0f1117;
+    color: white;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+  }
+  
+  header {
+    display: flex;
+    justify-content: space-between;
+    background-color: #111;
+    padding: 1rem 2rem;
+    align-items: center;
+  }
+  
+  .logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+  
+  nav a {
+    margin: 0 10px;
+    color: lightgray;
+    text-decoration: none;
+    position: relative;
+    padding-bottom: 5px;
+  }
+  
+  nav a:hover {
+    color: #a6ff00;
+  }
+  
+  nav a.active {
+    color: #a6ff00;
+  }
+  
+  nav a.active::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: #a6ff00;
+  }
+  
+  .btn {
+    margin-left: 10px;
+    padding: 5px 10px;
+    background-color: #a6ff00;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .btn:hover {
+    background-color: #88d100;
+  }
+  
+  .highlight {
+    color: #a6ff00;
+  }
+  
+  main {
+    max-width: 800px;
+    margin: 3rem auto;
+    padding: 0 1rem;
+  }
+  
+  .textbox textarea {
+    width: 100%;
+    height: 200px;
+    padding: 1rem;
+    background-color: #1c1f26;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    resize: vertical;
+  }
+  
+  .buttons {
+    margin: 1rem;
+  }
+  
+  .buttons button {
+    padding: 10px 20px;
+    background-color: #a6ff00;
+    border: none;
+    margin: 0 10px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .buttons button:hover {
+    background-color: #88d100;
+  }
+  
+  #resultBox {
+    margin-top: 1rem;
+    color: #a6ff00;
+  }
+  
+  #resultBox button {
+    margin-top: 0.5rem;
+    padding: 5px 10px;
+    background-color: transparent;
+    border: 1px solid #a6ff00;
+    color: #a6ff00;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  #resultBox button:hover {
+    background-color: rgba(166, 255, 0, 0.1);
+  }
+  
+  /* Modal styling */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+  
+  .modal-content {
+    background-color: #1c1f26;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #333;
+    border-radius: 10px;
+    width: 80%;
+    max-width: 500px;
+  }
+  
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  
+  .close:hover,
+  .close:focus {
+    color: #a6ff00;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  
+  /* Form styling */
+  form {
+    display: flex;
+    flex-direction: column;
+    margin-top: 1rem;
+  }
+  
+  form input {
+    margin: 0.5rem 0;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #333;
+    background-color: #252930;
+    color: white;
+  }
+  
+  form button {
+    margin-top: 1rem;
+    padding: 10px;
+    background-color: #a6ff00;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  /* Content pages styling */
+  .content {
+    text-align: left;
+    margin-top: 2rem;
+  }
+  
+  .content h2 {
+    color: #a6ff00;
+    margin-top: 2rem;
+  }
+  
+  .dataset-stats {
+    display: flex;
+    justify-content: space-between;
+    margin: 2rem 0;
+  }
+  
+  .stat-box {
+    background-color: #1c1f26;
+    padding: 1rem;
+    border-radius: 8px;
+    width: 30%;
+  }
+  
+  .stat-number {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #a6ff00;
+  }
+  
+  /* Notebook & Code page styling */
+  .notebook-section, .code-section {
+    margin: 2rem 0;
+  }
+  
+  .code-block {
+    background-color: #1c1f26;
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+  }
+  
+  .code-block pre {
+    text-align: left;
+    color: #ddd;
+    font-family: monospace;
+    margin: 0;
+  }
+  
+  .github-link {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: #1c1f26;
+    color: #a6ff00;
+    text-decoration: none;
+    border-radius: 5px;
+  }
+  
+  .github-link:hover {
+    background-color: #252930;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    header {
+      flex-direction: column;
+      padding: 1rem;
+    }
+    
+    nav {
+      margin-top: 1rem;
+    }
+    
+    nav a {
+      margin: 0 5px;
+    }
+    
+    .dataset-stats {
+      flex-direction: column;
+    }
+    
+    .stat-box {
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+  }

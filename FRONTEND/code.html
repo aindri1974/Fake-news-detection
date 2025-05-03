@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Code Source - Fake News Detection</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="logo">FAKENEWS</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="dataset.html">Dataset</a>
+      <a href="notebook.html">Notebook</a>
+      <a href="code.html" class="active">Code Source</a>
+      <button class="btn" onclick="openModal('signupModal')">Sign Up</button>
+      <button class="btn" onclick="openModal('loginModal')">Login</button>
+    </nav>
+  </header>
+
+  <main>
+    <h1><span class="highlight">Code</span> Source</h1>
+    <div class="content">
+      <h2>Project Structure</h2>
+      <p>This fake news detection project consists of several components:</p>
+      <ul>
+        <li><strong>Frontend</strong>: HTML, CSS, and JavaScript code for the web interface</li>
+        <li><strong>Backend</strong>: Flask API to serve the machine learning model</li>
+        <li><strong>Model</strong>: Trained machine learning model for fake news classification</li>
+      </ul>
+
+      <div class="code-section">
+        <h3>Backend API (Flask)</h3>
+        <div class="code-block">
+          <pre>
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+import joblib
+import pandas as pd
+from random import randrange
+
+# Initialize Flask app
+app = Flask(__name__)
+CORS(app)  # Allow cross-origin requests
+
+# Load your pre-trained model and vectorizer
+model = joblib.load("model/fake_news_model.pkl")
+vectorizer = joblib.load("model/tfidf_vectorizer.pkl")
+
+@app.route('/predict', methods=['POST'])
+def predict():
+    try:
+        data = request.get_json()
+        text = data.get('text', '')
+        if not text.strip():
+            return jsonify({'error': 'Empty text'}), 400
+
+        # Preprocess and vectorize
+        features = vectorizer.transform([text])
+        prediction = model.predict(features)[0]
+
+        return jsonify({'label': int(prediction)})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/random', methods=['GET'])
+def random():
+    try:
+        data = pd.read_csv("random_dataset.csv")
+        index = randrange(0, len(data)-1, 1)
+        return jsonify({
+            'text': data.loc[index].text,
+            'label': int(data.loc[index].label)
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+if __name__ == '__main__':
+    app.run(debug=True)
+          </pre>
+        </div>
+      </div>
+
+      <div class="code-section">
+        <h3>Model Training (Python)</h3>
+        <div class="code-block">
+          <pre>
+# Import required libraries
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, classification_report
+import joblib
+
+# Load dataset
+data = pd.read_csv('news_dataset.csv')
+
+# Split into features and target
+X = data['text']
+y = data['label']
+
+# Split into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Feature extraction
+tfidf_vectorizer = TfidfVectorizer(stop_words='english', max_features=5000)
+X_train_tfidf = tfidf_vectorizer.fit_transform(X_train)
+X_test_tfidf = tfidf_vectorizer.transform(X_test)
+
+# Train model
+model = LogisticRegression(max_iter=1000)
+model.fit(X_train_tfidf, y_train)
+
+# Evaluate model
+y_pred = model.predict(X_test_tfidf)
+accuracy = accuracy_score(y_test, y_pred)
+print(f"Accuracy: {accuracy:.4f}")
+print(classification_report(y_test, y_pred))
+
+# Save model and vectorizer
+joblib.dump(model, 'model/fake_news_model.pkl')
+joblib.dump(tfidf_vectorizer, 'model/tfidf_vectorizer.pkl')
+          </pre>
+        </div>
+      </div>
+
+      <h2>GitHub Repository</h2>
+      <p>The source code for this project will be available on GitHub soon.</p>
+      <!-- Remove or update the link when you create your actual repository -->
+      <!-- <a href="https://github.com/yourusername/fake-news-detection" class="github-link" target="_blank">
+        github.com/yourusername/fake-news-detection
+      </a> -->
+    </div>
+  </main>
+
+  <!-- Modals for Sign Up and Login -->
+  <div id="signupModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('signupModal')">&times;</span>
+      <h2>Sign Up</h2>
+      <form id="signupForm">
+        <input type="text" placeholder="Full Name" required>
+        <input type="email" placeholder="Email" required>
+        <input type="password" placeholder="Password" required>
+        <button type="submit">Sign Up</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="loginModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('loginModal')">&times;</span>
+      <h2>Login</h2>
+      <form id="loginForm">
+        <input type="email" placeholder="Email" required>
+        <input type="password" placeholder="Password" required>
+        <button type="submit">Login</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

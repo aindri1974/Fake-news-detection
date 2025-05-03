@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dataset - Fake News Detection</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="logo">FAKENEWS</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="dataset.html" class="active">Dataset</a>
+      <a href="notebook.html">Notebook</a>
+      <a href="code.html">Code Source</a>
+      <button class="btn" onclick="openModal('signupModal')">Sign Up</button>
+      <button class="btn" onclick="openModal('loginModal')">Login</button>
+    </nav>
+  </header>
+
+  <main>
+    <h1><span class="highlight">Dataset</span> Information</h1>
+    <div class="content">
+      <h2>About Our Dataset</h2>
+      <p>Our fake news detection model was trained on a comprehensive dataset comprising real and fake news articles.</p>
+      
+      <div class="dataset-stats">
+        <div class="stat-box">
+          <h3>Total Articles</h3>
+          <p class="stat-number">10,000+</p>
+        </div>
+        <div class="stat-box">
+          <h3>Fake News</h3>
+          <p class="stat-number">5,000+</p>
+        </div>
+        <div class="stat-box">
+          <h3>Real News</h3>
+          <p class="stat-number">5,000+</p>
+        </div>
+      </div>
+
+      <h2>Data Sources</h2>
+      <p>The dataset was collected from multiple reliable sources including:</p>
+      <ul>
+        <li>Kaggle Fake News Dataset</li>
+        <li>News article archives from verified publications</li>
+        <li>Fact-checking websites</li>
+      </ul>
+
+      <h2>Features</h2>
+      <p>Our model analyzes various features in news text, including:</p>
+      <ul>
+        <li>Language patterns</li>
+        <li>Word frequency</li>
+        <li>Sentiment analysis</li>
+        <li>Source credibility markers</li>
+      </ul>
+    </div>
+  </main>
+
+  <!-- Modals for Sign Up and Login -->
+  <div id="signupModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('signupModal')">&times;</span>
+      <h2>Sign Up</h2>
+      <form id="signupForm">
+        <input type="text" placeholder="Full Name" required>
+        <input type="email" placeholder="Email" required>
+        <input type="password" placeholder="Password" required>
+        <button type="submit">Sign Up</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="loginModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('loginModal')">&times;</span>
+      <h2>Login</h2>
+      <form id="loginForm">
+        <input type="email" placeholder="Email" required>
+        <input type="password" placeholder="Password" required>
+        <button type="submit">Login</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
