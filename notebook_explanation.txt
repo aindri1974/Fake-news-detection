@@ -1,0 +1,355 @@
+===================================================================
+DETAILED EXPLANATION OF fake-news-detection.ipynb NOTEBOOK
+===================================================================
+
+This document provides a line-by-line explanation of the Fake News Detection project notebook.
+
+-----------------------------------------
+SECTION: Importing Libraries
+-----------------------------------------
+
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import classification_report
+import re
+import string
+
+These lines import all necessary libraries:
+- pandas (pd): For data manipulation and analysis
+- numpy (np): For numerical operations
+- seaborn (sns) and matplotlib.pyplot (plt): For data visualization
+- train_test_split: From sklearn to split data into training and testing sets
+- accuracy_score and classification_report: From sklearn for model evaluation
+- re: For regular expression operations used in text cleaning
+- string: For string manipulation operations
+
+-----------------------------------------
+SECTION: Importing Dataset
+-----------------------------------------
+
+df_fake = pd.read_csv("../input/fake-news-detection/Fake.csv")
+df_true = pd.read_csv("../input/fake-news-detection/True.csv")
+
+These lines load two datasets:
+- df_fake: A dataset containing fake news articles
+- df_true: A dataset containing legitimate news articles
+
+df_fake.head() and df_true.head(5)
+These commands display the first 5 rows of each dataset to inspect their structure.
+
+-----------------------------------------
+SECTION: Adding Class Labels
+-----------------------------------------
+
+df_fake["class"] = 0
+df_true["class"] = 1
+
+These lines add a new column called "class" to each dataset:
+- 0 for fake news
+- 1 for true news
+
+This will be our target variable for prediction.
+
+-----------------------------------------
+SECTION: Preparing Manual Testing Set
+-----------------------------------------
+
+df_fake_manual_testing = df_fake.tail(10)
+for i in range(23480,23470,-1):
+    df_fake.drop([i], axis = 0, inplace = True)
+    
+df_true_manual_testing = df_true.tail(10)
+for i in range(21416,21406,-1):
+    df_true.drop([i], axis = 0, inplace = True)
+
+These lines:
+1. Extract the last 10 rows from each dataset to create a manual testing set
+2. Remove these 10 rows from the original datasets
+3. This gives us a separate test set for manual validation later
+
+df_fake_manual_testing["class"] = 0
+df_true_manual_testing["class"] = 1
+
+These lines ensure the manual testing sets have the proper class labels.
+
+df_manual_testing = pd.concat([df_fake_manual_testing,df_true_manual_testing], axis = 0)
+df_manual_testing.to_csv("manual_testing.csv")
+
+These lines:
+1. Combine both manual testing sets into one dataframe
+2. Save this combined set to a CSV file for later use
+
+-----------------------------------------
+SECTION: Merging Datasets
+-----------------------------------------
+
+df_merge = pd.concat([df_fake, df_true], axis =0 )
+
+This line merges the fake and true news datasets (without the manual testing rows) into a single dataframe.
+
+-----------------------------------------
+SECTION: Data Cleaning
+-----------------------------------------
+
+df = df_merge.drop(["title", "subject","date"], axis = 1)
+
+This line removes unnecessary columns, keeping only the "text" and "class" columns.
+
+df.isnull().sum()
+
+This line checks for missing values in the dataset.
+
+-----------------------------------------
+SECTION: Shuffling Data
+-----------------------------------------
+
+df = df.sample(frac = 1)
+
+This line randomly shuffles all rows in the dataset to ensure randomness when splitting into training and testing sets.
+
+df.reset_index(inplace = True)
+df.drop(["index"], axis = 1, inplace = True)
+
+These lines:
+1. Reset the index after shuffling
+2. Remove the old index column which is no longer needed
+
+-----------------------------------------
+SECTION: Text Preprocessing
+-----------------------------------------
+
+def wordopt(text):
+    text = text.lower()
+    text = re.sub('\\[.*?\\]', '', text)
+    text = re.sub("\\\\W"," ",text) 
+    text = re.sub('https?://\\S+|www\\.\\S+', '', text)
+    text = re.sub('<.*?>+', '', text)
+    text = re.sub('[%s]' % re.escape(string.punctuation), '', text)
+    text = re.sub('\\n', '', text)
+    text = re.sub('\\w*\\d\\w*', '', text)    
+    return text
+
+This function cleans the text data by:
+1. Converting to lowercase
+2. Removing content in square brackets
+3. Replacing non-word characters with spaces
+4. Removing URLs
+5. Removing HTML tags
+6. Removing punctuation
+7. Removing newlines
+8. Removing words containing numbers
+
+df["text"] = df["text"].apply(wordopt)
+
+This line applies the text cleaning function to every article in the dataset.
+
+-----------------------------------------
+SECTION: Feature Definition
+-----------------------------------------
+
+x = df["text"]
+y = df["class"]
+
+These lines define:
+- x: The feature (text content)
+- y: The target variable (class - fake or real)
+
+-----------------------------------------
+SECTION: Train-Test Split
+-----------------------------------------
+
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.25)
+
+This line splits the data:
+- 75% for training
+- 25% for testing
+
+-----------------------------------------
+SECTION: Text Vectorization
+-----------------------------------------
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+vectorization = TfidfVectorizer()
+xv_train = vectorization.fit_transform(x_train)
+xv_test = vectorization.transform(x_test)
+
+These lines:
+1. Import the TF-IDF vectorizer
+2. Create a vectorization object
+3. Transform the training text into numerical features using TF-IDF
+4. Transform the testing text using the same vectorizer
+
+TF-IDF (Term Frequency-Inverse Document Frequency) converts text into numbers by considering:
+- How frequently a word appears in a document
+- How unique a word is across all documents
+
+-----------------------------------------
+SECTION: Model 1 - Logistic Regression
+-----------------------------------------
+
+from sklearn.linear_model import LogisticRegression
+
+LR = LogisticRegression()
+LR.fit(xv_train,y_train)
+
+These lines:
+1. Import the Logistic Regression algorithm
+2. Create a Logistic Regression model
+3. Train it on the vectorized training data
+
+pred_lr = LR.predict(xv_test)
+LR.score(xv_test, y_test)
+print(classification_report(y_test, pred_lr))
+
+These lines:
+1. Make predictions on the test data
+2. Calculate and output the accuracy score
+3. Print a detailed classification report with precision, recall, and F1-score
+
+-----------------------------------------
+SECTION: Model 2 - Decision Tree
+-----------------------------------------
+
+from sklearn.tree import DecisionTreeClassifier
+
+DT = DecisionTreeClassifier()
+DT.fit(xv_train, y_train)
+
+These lines:
+1. Import the Decision Tree classifier
+2. Create a Decision Tree model
+3. Train it on the vectorized training data
+
+pred_dt = DT.predict(xv_test)
+DT.score(xv_test, y_test)
+print(classification_report(y_test, pred_dt))
+
+These lines evaluate the Decision Tree model similarly to how the Logistic Regression model was evaluated.
+
+-----------------------------------------
+SECTION: Model 3 - Gradient Boosting Classifier
+-----------------------------------------
+
+from sklearn.ensemble import GradientBoostingClassifier
+
+GBC = GradientBoostingClassifier(random_state=0)
+GBC.fit(xv_train, y_train)
+
+These lines:
+1. Import the Gradient Boosting classifier
+2. Create a GBC model with a fixed random seed for reproducibility
+3. Train it on the vectorized training data
+
+pred_gbc = GBC.predict(xv_test)
+GBC.score(xv_test, y_test)
+print(classification_report(y_test, pred_gbc))
+
+These lines evaluate the Gradient Boosting Classifier model.
+
+-----------------------------------------
+SECTION: Model 4 - Random Forest Classifier
+-----------------------------------------
+
+from sklearn.ensemble import RandomForestClassifier
+
+RFC = RandomForestClassifier(random_state=0)
+RFC.fit(xv_train, y_train)
+
+These lines:
+1. Import the Random Forest classifier
+2. Create an RFC model with a fixed random seed
+3. Train it on the vectorized training data
+
+pred_rfc = RFC.predict(xv_test)
+RFC.score(xv_test, y_test)
+print(classification_report(y_test, pred_rfc))
+
+These lines evaluate the Random Forest Classifier model.
+
+-----------------------------------------
+SECTION: Model Testing Functions
+-----------------------------------------
+
+def output_lable(n):
+    if n == 0:
+        return "Fake News"
+    elif n == 1:
+        return "Not A Fake News"
+
+This function converts numerical predictions (0 or 1) into human-readable labels.
+    
+def manual_testing(news):
+    testing_news = {"text":[news]}
+    new_def_test = pd.DataFrame(testing_news)
+    new_def_test["text"] = new_def_test["text"].apply(wordopt) 
+    new_x_test = new_def_test["text"]
+    new_xv_test = vectorization.transform(new_x_test)
+    pred_LR = LR.predict(new_xv_test)
+    pred_DT = DT.predict(new_xv_test)
+    pred_GBC = GBC.predict(new_xv_test)
+    pred_RFC = RFC.predict(new_xv_test)
+
+    return print("\n\nLR Prediction: {} \nDT Prediction: {} \nGBC Prediction: {} \nRFC Prediction: {}".format(output_lable(pred_LR[0]), output_lable(pred_DT[0]), output_lable(pred_GBC[0]), output_lable(pred_RFC[0])))
+
+This function:
+1. Takes a news article as input
+2. Prepares it (converts to DataFrame, cleans text)
+3. Vectorizes it using the same TF-IDF vectorizer
+4. Makes predictions using all four trained models
+5. Returns the predictions in a formatted way
+
+-----------------------------------------
+SECTION: Manual Testing Examples
+-----------------------------------------
+
+news = str(input())
+manual_testing(news)
+
+These lines:
+1. Take a news article as user input
+2. Pass it to the manual_testing function
+3. Display predictions from all models
+
+-----------------------------------------
+SECTION: Saving Models
+-----------------------------------------
+
+import joblib
+from joblib import dump
+
+dump(LR, 'LR_model.joblib')
+dump(DT, 'DT_model.joblib')
+dump(GBC, 'GBC_model.joblib')
+dump(RFC, 'RFC_model.joblib')
+
+These lines:
+1. Import joblib for model serialization
+2. Save each trained model to a file
+3. This allows the models to be reused later without retraining
+
+===================================================================
+IMPORTANT NOTE ON LABELS
+===================================================================
+
+In this project:
+- Class 0 = Fake News
+- Class 1 = Real News
+
+This labeling is consistent throughout the notebook. If implementing this in a web application or other system, ensure the same labeling convention is maintained to avoid misinterpreting results.
+
+===================================================================
+POTENTIAL ISSUES
+===================================================================
+
+The most common issue that might arise is a mismatch between how the labels are assigned in the training data versus how they're interpreted in the application. Always double-check:
+
+1. In training: 0 = Fake, 1 = Real
+2. When displaying results: Ensure "0" is always displayed as "Fake News"
+3. When evaluating new articles: Make sure preprocessing exactly matches what was done in training
+
+===================================================================

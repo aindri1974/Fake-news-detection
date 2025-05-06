@@ -23,7 +23,10 @@ def predict():
         # Preprocess and vectorize
         features = vectorizer.transform([text])
         prediction = model.predict(features)[0]
-
+        
+        # Invert the prediction to fix the label mismatch
+        prediction = 1 - prediction
+        
         return jsonify({'label': int(prediction)})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
